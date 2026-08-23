@@ -1,0 +1,53 @@
+:root {
+  color: #1f2937;
+  background: #f3f4f6;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  box-sizing: border-box;
+  max-width: 960px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px;
+  background: #ffffff;
+}
+
+section {
+  margin-top: 32px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+button {
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px;
+}
+
+dt {
+  font-weight: 700;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.error {
+  color: #b91c1c;
+  font-weight: 700;
+}

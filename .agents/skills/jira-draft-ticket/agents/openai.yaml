@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jiraチケット本文案"
+  short_description: "プロジェクト規約に沿ったJiraチケット本文案を作成します"
+  default_prompt: "Use $jira-draft-ticket to draft a copy-ready Jira ticket for my task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "プロジェクト変更検証"
+  short_description: "Git差分から必要な検証を選択し、実行結果を整理します"
+  default_prompt: "Use $verify-project-changes to run the checks required by the current project changes and summarize the results."

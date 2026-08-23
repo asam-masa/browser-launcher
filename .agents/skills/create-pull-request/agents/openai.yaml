@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR作成"
+  short_description: "レビュー結果と検証内容を整理してPRを安全に作成します"
+  default_prompt: "Use $create-pull-request to create a pull request for my current branch."

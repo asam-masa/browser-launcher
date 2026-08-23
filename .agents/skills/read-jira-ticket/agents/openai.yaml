@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jiraチケット参照"
+  short_description: "Jiraチケットの必要な項目を読み取り専用で取得します"
+  default_prompt: "Use $read-jira-ticket to retrieve a Jira ticket by key without modifying Jira."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "コミットメッセージ案"
+  short_description: "差分とチケットから規約に沿ったコミットメッセージ案を作成します"
+  default_prompt: "Use $draft-commit-message to propose a commit message for my current changes."

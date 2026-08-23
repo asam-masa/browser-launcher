@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux verification
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Install Markdown tooling
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: npm --prefix frontend ci
+
+      - name: Generate Wails bindings
+        run: |
+          mkdir -p frontend/dist
+          printf '<!doctype html><title>binding generation placeholder</title>\n' > frontend/dist/index.html
+          go run github.com/wailsapp/wails/v2/cmd/wails@v2.12.0 generate module
+
+      - name: Lint Markdown
+        run: npm run lint:markdown
+
+      - name: Test frontend
+        run: npm --prefix frontend test -- --run
+
+      - name: Build frontend
+        run: npm --prefix frontend run build
+
+      - name: Test Go
+        run: go test ./...
+
+      - name: Test Go with race detector
+        run: go test -race ./...
+
+      - name: Vet Go
+        run: go vet ./...
+
+  windows:
+    name: Windows verification
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Install Markdown tooling
+        run: npm.cmd ci
+
+      - name: Install frontend dependencies
+        run: npm.cmd --prefix frontend ci
+
+      - name: Generate Wails bindings
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/develop/generate-wails-bindings.ps1
+
+      - name: Test frontend
+        run: npm.cmd --prefix frontend test -- --run
+
+      - name: Build frontend
+        run: npm.cmd --prefix frontend run build
+
+      - name: Test Go
+        run: go test ./...
+
+      - name: Vet Go
+        run: go vet ./...
+
+      - name: Build Go
+        run: go build ./...

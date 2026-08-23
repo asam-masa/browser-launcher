@@ -1,0 +1,35 @@
+# Go
+bin/
+coverage.out
+
+# Node
+node_modules/
+dist/
+frontend/wailsjs/
+frontend/package.json.md5
+
+# VSCode
+.vscode/*
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Private keys and signing credentials
+*.key
+*.pem
+*.p12
+*.pfx
+*.ppk
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519

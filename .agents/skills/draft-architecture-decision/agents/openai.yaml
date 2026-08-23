@@ -1,0 +1,4 @@
+interface:
+  display_name: "ADR案の作成"
+  short_description: "設計候補を比較し、承認された判断からADR案を作成します"
+  default_prompt: "Use $draft-architecture-decision to compare architecture options and draft an ADR without finalizing the decision before approval."

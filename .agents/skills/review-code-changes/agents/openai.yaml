@@ -1,0 +1,4 @@
+interface:
+  display_name: "コード差分レビュー"
+  short_description: "プロジェクト規約に沿ってコード差分をレビューします"
+  default_prompt: "Use $review-code-changes to review my current code changes."

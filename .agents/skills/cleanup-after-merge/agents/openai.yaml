@@ -1,0 +1,4 @@
+interface:
+  display_name: "マージ後のローカル整理"
+  short_description: "PRマージ後のmain更新とローカルブランチ削除を安全に進めます"
+  default_prompt: "Use $cleanup-after-merge to safely update local main and remove a merged local branch after verifying the pull request."

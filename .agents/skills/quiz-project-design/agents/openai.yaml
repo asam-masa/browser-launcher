@@ -1,0 +1,4 @@
+interface:
+  display_name: "プロジェクト設計クイズ"
+  short_description: "現在の設計と実装を根拠付きの4択問題で効率よく復習します"
+  default_prompt: "Use $quiz-project-design to review project design and architecture through evidence-backed multiple-choice questions."

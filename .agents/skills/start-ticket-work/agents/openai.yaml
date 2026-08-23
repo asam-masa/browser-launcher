@@ -1,0 +1,4 @@
+interface:
+  display_name: "チケット作業の開始"
+  short_description: "要件と依存関係を確認し、最新のmainから作業ブランチを作成します"
+  default_prompt: "Use $start-ticket-work to verify a Jira ticket, dependencies, and Git state before creating a work branch from the latest main."

@@ -84,8 +84,26 @@ Private版の改名はGit履歴を書き換えません。Public版には、移�
 | Go | Unit Test、Go Vet、Go Buildが成功 |
 | race detector | WSL環境にCコンパイラーがないため未実施。Linux CIで確認する |
 | Private版 | `asam-masa/browser-launcher-private`へ改名後もPrivate、未アーカイブ、既定ブランチ`main`、基準コミットが維持されている |
+| Public版候補 | `asam-masa/browser-launcher`をPrivateで作成し、初期コミット`22c1437`を`main`へpush |
+| GitHub Actions | 初期コミットに対するLinuxとWindowsの検証が成功 |
 
 検出0件は秘密情報が存在しないことを保証しません。Public版の初期コミットを作成した後、Git履歴を対象に再検査します。
+
+### Public化前のGitHub設定
+
+2026年8月23日に、Public版候補がPrivateの状態でGitHub APIから確認しました。
+
+| 確認項目 | 結果 |
+| --- | --- |
+| Actions | 有効。許可するActionは`all`、SHA固定の強制は無効 |
+| `GITHUB_TOKEN` | 既定権限はread、Pull Requestの承認は不可 |
+| Secret scanningとPush protection | `security_and_analysis`を取得できず、未確認 |
+| Dependabot alerts | APIがHTTP 404で終了し、未確認 |
+| Dependabot security updates | Automated security fixes APIはHTTP 200。実際の有効状態は未確認 |
+| Private vulnerability reporting | APIがHTTP 404で終了し、未確認 |
+| Ruleset | APIがHTTP 403で終了し、未確認 |
+
+workflowで使用するActionはコミットSHAへ固定済みです。Public化後に利用可能な設定を有効化し、APIとGitHub上の表示から再確認します。
 
 ### 移行後検証
 

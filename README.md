@@ -6,7 +6,7 @@ Windows 11でGoogle Chromeを指定した大きさと位置に起動するアプ
 
 本プロジェクトは、Go、React、DDD、クリーンアーキテクチャを学びながら、開発者本人が使用するツールを作ることを目的としています。ソースコードと開発過程は公開しますが、Windows向け実行ファイルやインストーラーは配布しません。
 
-初期開発はPrivateリポジトリで行いました。秘密情報、個人情報、ライセンス、公開文書を監査した後、監査済みのファイルから新しいGit履歴を作成してPublic版を開始します。過去のPrivate版のコミットとPull RequestはPublic版へ移行しません。
+初期開発はPrivateリポジトリで行いました。秘密情報、個人情報、ライセンス、公開文書を監査した後、監査済みのファイルから新しいGit履歴を作成してPublic版を開始しました。過去のPrivate版のコミットとPull RequestはPublic版へ移行していません。
 
 ## 設計方針
 
@@ -29,7 +29,7 @@ Windows 11でGoogle Chromeを指定した大きさと位置に起動するアプ
 次の環境を準備します。
 
 - Windows 11
-- Go 1.23以上
+- Go 1.26.6以上
 - Node.js 22以上
 - npm
 - Microsoft Edge WebView2 Runtime

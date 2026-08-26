@@ -9,7 +9,7 @@ SCRUM-14で検討しているWails v2のメソッドバインディング、イ�
 ## 検証環境
 
 - Windows 11
-- Go 1.23以上
+- Go 1.26.6以上
 - Node.js 22以上
 - npm
 - Microsoft Edge WebView2 Runtime

@@ -2,7 +2,7 @@
 
 ## 状態
 
-移行作業中です。Private版は改名済みです。Public版の作成、初期コミット、Public化は未実施です。
+2026年8月23日に移行を完了しました。Private版は既存履歴を維持してPrivateのまま保管し、監査済みファイルから作成したPublic版で今後の開発を継続します。
 
 ## 目的
 
@@ -84,10 +84,10 @@ Private版の改名はGit履歴を書き換えません。Public版には、移�
 | Go | Unit Test、Go Vet、Go Buildが成功 |
 | race detector | WSL環境にCコンパイラーがないため未実施。Linux CIで確認する |
 | Private版 | `asam-masa/browser-launcher-private`へ改名後もPrivate、未アーカイブ、既定ブランチ`main`、基準コミットが維持されている |
-| Public版候補 | `asam-masa/browser-launcher`をPrivateで作成し、初期コミット`22c1437`を`main`へpush |
-| GitHub Actions | 初期コミットに対するLinuxとWindowsの検証が成功 |
+| Public版 | `asam-masa/browser-launcher`をPrivateで作成し、初期コミット`22c1437`から新しい履歴を開始 |
+| GitHub Actions | 初期コミットと公開直前の`9664225`に対するLinuxとWindowsの検証が成功 |
 
-検出0件は秘密情報が存在しないことを保証しません。Public版の初期コミットを作成した後、Git履歴を対象に再検査します。
+検出0件は秘密情報が存在しないことを保証しません。Public版の初期コミット作成後にもGit履歴を再検査し、検出0件を確認しました。
 
 ### Public化前のGitHub設定
 
@@ -107,16 +107,52 @@ workflowで使用するActionはコミットSHAへ固定済みです。Public化
 
 ### 移行後検証
 
-移行実施後に、値や検出内容などの秘密情報を記録せず、次の結果を追記します。
+2026年8月23日に、Public化とセキュリティ設定の適用後に確認しました。
 
-- 基準コミットと公開対象ファイル
-- Gitleaksによる移行対象とPublic版Git履歴の検査結果
-- ローカル検証とLinux・Windows CIの結果
-- ID付き`noreply`メールの確認結果
-- Public版の可視性と公開表示
-- Private vulnerability reporting、Secret scanning、Push protection、Dependabot、Rulesetの設定結果
-- ForkからのPull Requestに対するActionsの承認設定
-- 未確認事項と残存リスク
+| 確認項目 | 結果 |
+| --- | --- |
+| Public版 | Public、未アーカイブ、既定ブランチは`main` |
+| 公開表示 | 未認証アクセスでリポジトリ、`README.md`、`LICENSE`、`SECURITY.md`がHTTP 200 |
+| Git履歴 | 公開直前の2コミットで、すべての作者・コミッターメールがID付き`noreply`形式 |
+| Gitleaks | 公開直前の全Git履歴で検出0件 |
+| Private版 | Private、未アーカイブ、既定ブランチ`main`と基準コミットを維持 |
+| Secret scanning | 有効 |
+| Push protection | 有効 |
+| Dependabot alerts | 有効 |
+| Dependabot security updates | 有効 |
+| Private vulnerability reporting | 有効。「Report a vulnerability」の表示を確認 |
+| Actions | 既定の`GITHUB_TOKEN`権限はread、Pull Requestの承認は不可 |
+| ForkからのPull Request | すべての外部コントリビューターによるworkflow実行に承認を要求 |
+| Ruleset | `Protect main`をActiveにし、既定ブランチへ適用 |
+
+`Protect main`では、Pull Request、会話の解決、最新の`main`への追従、`Linux verification`、`Windows verification`、linear history、squash mergeを必須にしています。ブランチ削除とForce pushは禁止し、bypass権限は設定していません。承認レビュー数は、個人開発で自己承認を必須にしないため0件です。
+
+## 既知脆弱性への対応
+
+Public化後にDependabot alertsを有効にした結果、ルートと`wails-communication` Spikeの`golang.org/x/crypto`と`golang.org/x/net`に38件のOpen alertを確認しました。Dependabot PR #1はSpikeの`golang.org/x/crypto`だけを更新するため、ルートとSpikeを同じ変更で整合させるSCRUM-51へ置き換えます。
+
+2026年8月23日の敵対的検証では、Go 1.26.4を使用した`govulncheck v1.7.0`により、ルートとSpikeの両方でGo標準ライブラリの`GO-2026-5972`が到達可能と判定されました。依存パッケージの既知脆弱性は、脆弱な関数を呼び出しているとは判定されませんでした。
+
+2026年8月26日に、SCRUM-51の作業ブランチで次を更新しました。
+
+| 対象 | 更新前 | 更新後 |
+| --- | --- | --- |
+| Go | 1.23.0以上 | 1.26.6以上 |
+| `golang.org/x/crypto` | v0.33.0 | v0.52.0 |
+| `golang.org/x/net` | v0.35.0 | v0.55.0 |
+| `golang.org/x/sys` | v0.30.0 | v0.45.0 |
+| `golang.org/x/text` | v0.22.0 | v0.37.0 |
+
+ルートとSpikeでは、Go 1.26.6によるUnit Test、Go Vet、Go Build、`govulncheck v1.7.0`が成功しました。Spikeは、管理対象外のWailsバインディングとFrontend成果物を生成してから検証しました。`govulncheck`で到達可能な既知脆弱性は検出されませんでした。
+
+## 残存リスクと未確認事項
+
+- Gitleaksの検出0件は、未知の形式や分割された秘密情報が存在しないことを保証しない
+- 実在する外部コントリビューターのForkからPull Requestを作成する検証は未実施
+- Linux CIでGoキャッシュの復元警告が発生したが、race detectorを含む全ステップとジョブは成功
+- Rulesetで必須チェック名を固定しているため、workflowのジョブ名を変更する場合はRulesetも更新する必要がある
+- SCRUM-51のLinux・Windows CIと、マージ後のDependabot alert解消状況は未確認
+- Spikeのnpm監査でHigh 1件を確認したが、Goの既知脆弱性を扱うSCRUM-51の対象外として変更していない
 
 ## 関連資料
 

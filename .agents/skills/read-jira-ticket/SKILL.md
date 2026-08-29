@@ -33,6 +33,7 @@ description: Retrieve one SCRUM Jira ticket through the Jira Cloud REST API with
 
 - APIホストは`https://api.atlassian.com`、Project Keyは`SCRUM`だけを許可する。
 - `JIRA_CLOUD_ID`はURLの単一パス要素として安全な形式だけを許可する。
+- `https://kurosahari.atlassian.net/_edge/tenant_info`へ認証情報なしでGETし、cloudIdが一致した場合だけ認証付きリクエストを許可する。
 - 同梱スクリプト以外の方法でJiraへ接続しない。
 - `POST`、`PUT`、`PATCH`、`DELETE`を実行しない。
 - コメント、添付ファイル、変更履歴、作業ログ、チケット一覧を取得しない。

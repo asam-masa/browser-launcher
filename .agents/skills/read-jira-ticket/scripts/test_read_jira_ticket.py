@@ -70,6 +70,11 @@ class ReadJiraTicketTest(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(target.JiraReadError):
                 target.validate_cloud_id(value)
 
+        self.assertEqual(
+            target.validate_cloud_id("AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE"),
+            "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        )
+
     def test_jira_api_base_url_uses_fixed_atlassian_host(self):
         self.assertEqual(
             target.jira_api_base_url("11111111-2222-3333-4444-555555555555"),
@@ -100,6 +105,30 @@ class ReadJiraTicketTest(unittest.TestCase):
         self.assertEqual(opener.request.full_url, "https://example.test/rest/api/3/field")
         self.assertEqual(opener.request.get_header("Authorization"), "Basic secret")
         self.assertEqual(opener.timeout, target.TIMEOUT_SECONDS)
+
+    def test_request_json_omits_authorization_when_not_provided(self):
+        opener = FakeOpener({"cloudId": "11111111-2222-3333-4444-555555555555"})
+        result = target.request_json(opener, target.ALLOWED_TENANT_INFO_URL)
+
+        self.assertEqual(result["cloudId"], "11111111-2222-3333-4444-555555555555")
+        self.assertIsNotNone(opener.request)
+        self.assertEqual(opener.request.get_method(), "GET")
+        self.assertIsNone(opener.request.get_header("Authorization"))
+
+    def test_validate_allowed_cloud_id_rejects_other_tenant(self):
+        allowed = "11111111-2222-3333-4444-555555555555"
+        opener = FakeOpener({"cloudId": allowed})
+
+        self.assertEqual(target.validate_allowed_cloud_id(opener, allowed), allowed)
+        with self.assertRaisesRegex(target.JiraReadError, "does not match"):
+            target.validate_allowed_cloud_id(
+                FakeOpener({"cloudId": allowed}),
+                "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            )
+
+    def test_validate_allowed_cloud_id_rejects_invalid_tenant_info(self):
+        with self.assertRaisesRegex(target.JiraReadError, "tenant information"):
+            target.validate_allowed_cloud_id(FakeOpener({}), "11111111-2222-3333-4444-555555555555")
 
     def test_request_json_classifies_expected_http_errors(self):
         cases = {

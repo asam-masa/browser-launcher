@@ -39,6 +39,8 @@ APIトークンには、可能であればClassic scopeの`read:jira-work`だけ
 https://api.atlassian.com/ex/jira/{cloudId}/rest/api/3/...
 ```
 
+スクリプトは、固定した`https://kurosahari.atlassian.net/_edge/tenant_info`へ認証情報なしでGETし、返されたcloudIdと`JIRA_CLOUD_ID`が一致した場合だけ、Authorizationヘッダーを付けたJira REST APIリクエストを実行します。これにより、認証情報の送信先と参照するJira Cloud環境の両方を制限します。
+
 cloudId、メールアドレス、APIトークンは、Codexを起動するたびに対話入力します。
 
 ```bash
@@ -73,6 +75,7 @@ SCRUM-26を参照して、目的と完了条件を確認して
 
 - APIホストを`https://api.atlassian.com`に固定する
 - cloudIdをURLの単一パス要素として安全な形式に制限する
+- 固定したJiraサイトから認証情報なしで取得したcloudIdとの一致を確認してから、認証付きリクエストを実行する
 - Project Keyを`SCRUM`に固定する
 - HTTPメソッドをGETに固定する
 - リダイレクトを拒否する

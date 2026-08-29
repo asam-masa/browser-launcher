@@ -7,6 +7,7 @@ import io
 import json
 import socket
 import unittest
+from unittest.mock import patch
 from urllib.error import HTTPError
 from urllib.request import Request
 
@@ -51,13 +52,43 @@ class ReadJiraTicketTest(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(target.JiraReadError):
                 target.validate_issue_key(value)
 
-    def test_validate_base_url(self):
+    def test_validate_cloud_id(self):
         self.assertEqual(
-            target.validate_base_url("https://kurosahari.atlassian.net/"),
-            target.ALLOWED_BASE_URL,
+            target.validate_cloud_id("11111111-2222-3333-4444-555555555555"),
+            "11111111-2222-3333-4444-555555555555",
         )
-        with self.assertRaises(target.JiraReadError):
-            target.validate_base_url("https://example.atlassian.net")
+        for value in (
+            "",
+            "..",
+            "../other",
+            "cloud/id",
+            "cloud?id",
+            "cloud id",
+            "11111111-2222-3333-4444-55555555555g",
+            "a" * 129,
+        ):
+            with self.subTest(value=value), self.assertRaises(target.JiraReadError):
+                target.validate_cloud_id(value)
+
+    def test_jira_api_base_url_uses_fixed_atlassian_host(self):
+        self.assertEqual(
+            target.jira_api_base_url("11111111-2222-3333-4444-555555555555"),
+            "https://api.atlassian.com/ex/jira/11111111-2222-3333-4444-555555555555",
+        )
+
+    def test_required_environment_requires_cloud_id_without_exposing_values(self):
+        values = {
+            "JIRA_CLOUD_ID": "11111111-2222-3333-4444-555555555555",
+            "JIRA_ACCOUNT_EMAIL": "account@example.test",
+            "JIRA_API_TOKEN": "secret-token",
+        }
+        with patch.dict(target.os.environ, values, clear=True):
+            self.assertEqual(target.required_environment(), tuple(values.values()))
+
+        with patch.dict(target.os.environ, {}, clear=True):
+            with self.assertRaisesRegex(target.JiraReadError, "JIRA_CLOUD_ID") as raised:
+                target.required_environment()
+        self.assertNotIn("secret-token", str(raised.exception))
 
     def test_request_json_uses_get_and_does_not_embed_credentials_in_url(self):
         opener = FakeOpener({"ok": True})
@@ -93,7 +124,7 @@ class ReadJiraTicketTest(unittest.TestCase):
 
     def test_redirects_are_rejected(self):
         handler = target.NoRedirectHandler()
-        request = Request("https://kurosahari.atlassian.net/rest/api/3/field")
+        request = Request("https://api.atlassian.com/ex/jira/cloud-id/rest/api/3/field")
 
         self.assertIsNone(
             handler.redirect_request(

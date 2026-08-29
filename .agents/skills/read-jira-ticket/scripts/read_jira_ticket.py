@@ -15,7 +15,11 @@ from urllib.parse import quote, urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 
-ALLOWED_BASE_URL = "https://kurosahari.atlassian.net"
+ATLASSIAN_API_BASE_URL = "https://api.atlassian.com/ex/jira"
+ALLOWED_TENANT_INFO_URL = "https://kurosahari.atlassian.net/_edge/tenant_info"
+CLOUD_ID_PATTERN = re.compile(
+    r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\Z"
+)
 ISSUE_KEY_PATTERN = re.compile(r"SCRUM-[1-9][0-9]*\Z")
 TIMEOUT_SECONDS = 15
 NOT_RETRIEVED = ["comments", "attachments", "changelog", "worklogs", "issue list"]
@@ -39,15 +43,19 @@ def validate_issue_key(issue_key: str) -> str:
     return issue_key
 
 
-def validate_base_url(base_url: str) -> str:
-    if base_url.rstrip("/") != ALLOWED_BASE_URL:
-        raise JiraReadError(f"JIRA_BASE_URL must be {ALLOWED_BASE_URL}")
-    return ALLOWED_BASE_URL
+def validate_cloud_id(cloud_id: str) -> str:
+    if not CLOUD_ID_PATTERN.fullmatch(cloud_id):
+        raise JiraReadError("JIRA_CLOUD_ID has an invalid format")
+    return cloud_id.lower()
+
+
+def jira_api_base_url(cloud_id: str) -> str:
+    return ATLASSIAN_API_BASE_URL + "/" + quote(validate_cloud_id(cloud_id), safe="")
 
 
 def required_environment() -> tuple[str, str, str]:
     values = {
-        "JIRA_BASE_URL": os.environ.get("JIRA_BASE_URL", ""),
+        "JIRA_CLOUD_ID": os.environ.get("JIRA_CLOUD_ID", ""),
         "JIRA_ACCOUNT_EMAIL": os.environ.get("JIRA_ACCOUNT_EMAIL", ""),
         "JIRA_API_TOKEN": os.environ.get("JIRA_API_TOKEN", ""),
     }
@@ -55,7 +63,7 @@ def required_environment() -> tuple[str, str, str]:
     if missing:
         raise JiraReadError("required environment variable is not set: " + ", ".join(missing))
     return (
-        validate_base_url(values["JIRA_BASE_URL"]),
+        validate_cloud_id(values["JIRA_CLOUD_ID"]),
         values["JIRA_ACCOUNT_EMAIL"],
         values["JIRA_API_TOKEN"],
     )
@@ -66,10 +74,13 @@ def authorization_header(account_email: str, api_token: str) -> str:
     return "Basic " + base64.b64encode(credentials).decode("ascii")
 
 
-def request_json(opener, url: str, authorization: str) -> Any:  # noqa: ANN001
+def request_json(opener, url: str, authorization: str | None = None) -> Any:  # noqa: ANN001
+    headers = {"Accept": "application/json"}
+    if authorization is not None:
+        headers["Authorization"] = authorization
     request = Request(
         url,
-        headers={"Accept": "application/json", "Authorization": authorization},
+        headers=headers,
         method="GET",
     )
     try:
@@ -91,6 +102,17 @@ def request_json(opener, url: str, authorization: str) -> Any:  # noqa: ANN001
         raise JiraReadError("Jira could not be reached") from None
     except (json.JSONDecodeError, UnicodeError, ValueError):
         raise JiraReadError("Jira returned an invalid JSON response") from None
+
+
+def validate_allowed_cloud_id(opener, configured_cloud_id: str) -> str:  # noqa: ANN001
+    tenant_info = request_json(opener, ALLOWED_TENANT_INFO_URL)
+    if not isinstance(tenant_info, dict) or not isinstance(tenant_info.get("cloudId"), str):
+        raise JiraReadError("Jira tenant information has an invalid format")
+    allowed_cloud_id = validate_cloud_id(tenant_info["cloudId"])
+    configured_cloud_id = validate_cloud_id(configured_cloud_id)
+    if configured_cloud_id != allowed_cloud_id:
+        raise JiraReadError("JIRA_CLOUD_ID does not match the allowed Jira site")
+    return configured_cloud_id
 
 
 def find_story_points_field(fields: Any) -> tuple[str | None, list[str]]:
@@ -243,9 +265,11 @@ def build_output(issue: Any, story_points_field: str | None, warnings: list[str]
     }
 
 
-def read_ticket(issue_key: str, base_url: str, account_email: str, api_token: str) -> dict[str, Any]:
-    authorization = authorization_header(account_email, api_token)
+def read_ticket(issue_key: str, cloud_id: str, account_email: str, api_token: str) -> dict[str, Any]:
     opener = build_opener(NoRedirectHandler())
+    cloud_id = validate_allowed_cloud_id(opener, cloud_id)
+    authorization = authorization_header(account_email, api_token)
+    base_url = jira_api_base_url(cloud_id)
 
     field_metadata = request_json(opener, base_url + "/rest/api/3/field", authorization)
     story_points_field, warnings = find_story_points_field(field_metadata)
@@ -265,8 +289,8 @@ def main(argv: list[str]) -> int:
         return 2
     try:
         issue_key = validate_issue_key(argv[1])
-        base_url, account_email, api_token = required_environment()
-        result = read_ticket(issue_key, base_url, account_email, api_token)
+        cloud_id, account_email, api_token = required_environment()
+        result = read_ticket(issue_key, cloud_id, account_email, api_token)
     except JiraReadError as error:
         print(f"error: {error}", file=sys.stderr)
         return 1

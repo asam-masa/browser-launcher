@@ -19,7 +19,7 @@ description: Retrieve one SCRUM Jira ticket through the Jira Cloud REST API with
    - Story Points
    - Parent
    - Issue Links
-3. `JIRA_BASE_URL`、`JIRA_ACCOUNT_EMAIL`、`JIRA_API_TOKEN`が設定済みか、値を表示せずに確認する。
+3. `JIRA_CLOUD_ID`、`JIRA_ACCOUNT_EMAIL`、`JIRA_API_TOKEN`が設定済みか、値を表示せずに確認する。
 4. 次を実行する。
 
    ```bash
@@ -31,7 +31,9 @@ description: Retrieve one SCRUM Jira ticket through the Jira Cloud REST API with
 
 ## 制約
 
-- Jiraサイトは`https://kurosahari.atlassian.net`、Project Keyは`SCRUM`だけを許可する。
+- APIホストは`https://api.atlassian.com`、Project Keyは`SCRUM`だけを許可する。
+- `JIRA_CLOUD_ID`はURLの単一パス要素として安全な形式だけを許可する。
+- `https://kurosahari.atlassian.net/_edge/tenant_info`へ認証情報なしでGETし、cloudIdが一致した場合だけ認証付きリクエストを許可する。
 - 同梱スクリプト以外の方法でJiraへ接続しない。
 - `POST`、`PUT`、`PATCH`、`DELETE`を実行しない。
 - コメント、添付ファイル、変更履歴、作業ログ、チケット一覧を取得しない。

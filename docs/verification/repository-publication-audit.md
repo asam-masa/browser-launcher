@@ -1,14 +1,22 @@
 # リポジトリ公開前監査
 
+## 文書の位置づけ
+
+本書は、2026年8月22日時点のPrivate版に対する公開前監査の記録です。文中の「現在」と
+未完了のチェック項目は、監査時点の状態と後続計画を示します。
+
+Public版への移行と公開後設定は2026年8月23日に完了しました。現在の完了結果は、
+[Public版リポジトリ移行](./public-repository-migration.md)を参照してください。
+
 ## 結論
 
-現在のリポジトリはPrivateのまま維持します。秘密情報の検査では検出がありませんでしたが、Git履歴にGitHubの`noreply`ではない作者・コミッターメールが含まれています。過去のメールを公開対象から除外するため、将来のPublic版は監査済みの管理対象ファイルから新しいリポジトリとして作成します。
+監査対象のリポジトリはPrivateのまま維持します。秘密情報の検査では検出がありませんでしたが、Git履歴にGitHubの`noreply`ではない作者・コミッターメールが含まれています。過去のメールを公開対象から除外するため、将来のPublic版は監査済みの管理対象ファイルから新しいリポジトリとして作成します。
 
 本監査では公開可否だけを評価しました。リポジトリの可視性、Git履歴、リモートブランチは変更していません。
 
 ## 対象
 
-- 現在の管理対象ファイル
+- 監査時点の管理対象ファイル
 - すべてのローカルGit参照から到達できる履歴
 - `AGENTS.md`と`.agents/skills/`
 - Jira連携に関する文書と実装
@@ -35,12 +43,12 @@
 
 | 確認項目 | 結果 | 公開判断 |
 | --- | --- | --- |
-| Git履歴の作者・コミッターメール | 2026年8月22日の`main`（`966d46d`）で、GitHubの`noreply`ではない作者・コミッターメールをそれぞれ68コミットで確認 | 現在のリポジトリをPrivateで維持し、新しいPublicリポジトリへ履歴を移行しない |
+| Git履歴の作者・コミッターメール | 2026年8月22日の`main`（`966d46d`）で、GitHubの`noreply`ではない作者・コミッターメールをそれぞれ68コミットで確認 | 監査対象のリポジトリをPrivateで維持し、新しいPublicリポジトリへ履歴を移行しない |
 | Linuxのホームディレクトリ | 該当なし | 公開可能 |
 | Windowsのユーザーディレクトリ | テスト用のパスを3ファイルで確認 | 実在利用者の情報ではないため公開可能 |
 | JiraサイトURL | 5ファイルで確認 | 認証情報ではなく、接続先を固定する安全要件と利用手順に必要なため公開可能。ただし、Jiraテナント名は公開される |
 
-SCRUM-45で[Git履歴のメールアドレス公開方針](../research/git-history-email-publication.md)を決定しました。現在のGit履歴は書き換えず、Public版へ移行しません。今後のコミットにはGitHubが提供するID付き`noreply`メールを使用します。
+SCRUM-45で[Git履歴のメールアドレス公開方針](../research/git-history-email-publication.md)を決定しました。監査対象のGit履歴は書き換えず、Public版へ移行しません。今後のコミットにはGitHubが提供するID付き`noreply`メールを使用します。
 
 ### AIエージェント関連ファイル
 
@@ -67,9 +75,11 @@ SCRUM-45で[Git履歴のメールアドレス公開方針](../research/git-histo
 
 `SECURITY.md`に、脆弱性を公開Issueへ記載しない方針を定義しました。[GitHubのPrivate vulnerability reporting](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository)はPublicリポジトリの管理者が設定する機能です。可視性を変更した直後に有効化し、報告経路を確認するまでPublic化を完了扱いにしません。
 
-2026年8月16日時点ではリポジトリがPrivateであるため、Private vulnerability reportingのAPIによる状態確認は404で終了しました。現在は非公開の報告窓口を提供していません。
+2026年8月16日時点ではリポジトリがPrivateであるため、Private vulnerability reportingのAPIによる状態確認は404で終了しました。監査時点では非公開の報告窓口を提供していませんでした。
 
 ## GitHub設定チェックリスト
+
+次のチェックリストは、監査時点で完了していた項目と、Public化に向けた後続計画を示します。
 
 ### 新しいPublicリポジトリの作成前
 
@@ -94,9 +104,9 @@ SCRUM-45で[Git履歴のメールアドレス公開方針](../research/git-histo
 - [ ] ForkからのPull Requestに対するActionsの承認設定を確認する
 - [ ] Public表示から秘密情報、個人情報、不要な内部情報が見えないことを再確認する
 
-Private状態では、現在のプランでBranch protection APIがHTTP 403となったため、設定状態を確認できませんでした。Public化後にRulesetまたはBranch protectionを設定し、CIを必須チェックにするかを判断します。
+Private状態では、監査時点のGitHubプランでBranch protection APIがHTTP 403となったため、設定状態を確認できませんでした。Public化後にRulesetまたはBranch protectionを設定し、CIを必須チェックにするかを判断します。
 
-## 未確認事項と残存リスク
+## 監査時点の未確認事項と残存リスク
 
 - Public版の作成と公開後確認は[Public版リポジトリ移行](./public-repository-migration.md)で扱う
 - Private vulnerability reporting、Secret scanning、Push protection、Dependabotの公開後設定は未実施

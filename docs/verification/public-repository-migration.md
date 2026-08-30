@@ -172,13 +172,16 @@ Linuxでは、両モジュールの`go mod tidy -diff`、Unit Test、Go Vet、Go
 
 2026年8月30日に、GitHubのCheck resultsでPR #3とPR #5の`Linux verification`および`Windows verification`が成功していることを確認しました。両PRは`main`へマージ済みです。GitHubのDependabot alertsで確認したOpen alertは0件であり、置き換え元のDependabot PR #1とPR #2は未マージでクローズ済みです。
 
+2026年8月30日に、SCRUM-55でSpike frontendの`nanoid`をv3.3.16からv3.3.18へ更新しました。クリーン環境で`npm ci`、`npm audit`、Frontend Buildが成功し、既知脆弱性が0件であることを確認しました。PR #7の`Linux verification`と`Windows verification`は成功し、`main`へマージ済みです。
+
+SCRUM-56では、Linux・Windows CIでSpike frontendの依存関係取得、Wailsバインディング生成、Frontend Buildを実行します。Linux CIでは`npm audit`も実行し、High severity以上の既知脆弱性を検出した場合は失敗させます。
+
 ## 残存リスクと未確認事項
 
 - Gitleaksの検出0件は、未知の形式や分割された秘密情報が存在しないことを保証しない
 - 実在する外部コントリビューターのForkからPull Requestを作成する検証は未実施
 - Linux CIでGoキャッシュの復元警告が発生したが、race detectorを含む全ステップとジョブは成功
 - Rulesetで必須チェック名を固定しているため、workflowのジョブ名を変更する場合はRulesetも更新する必要がある
-- 2026年8月30日のSpike frontendのnpm監査では、`nanoid`の`GHSA-2v37-7h3g-55p8`がHigh 1件として残っている
 
 ## 関連資料
 

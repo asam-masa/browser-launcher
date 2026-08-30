@@ -81,6 +81,9 @@ jobs:
       - name: Lint Markdown
         run: npm run lint:markdown
 
+      - name: Check Markdown links
+        run: python3 -B .agents/skills/check-doc-consistency/scripts/check_markdown_links.py .
+
       - name: Test frontend
         run: npm --prefix frontend test -- --run
 

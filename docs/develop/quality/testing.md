@@ -104,7 +104,7 @@ GitHub Actionsの`.github/workflows/ci.yml`で、`pull_request`と`main`への`p
 
 | 環境 | 自動検証 |
 | --- | --- |
-| Linux | Markdown Lint、ReactのUnit Testとビルド、GoのUnit Test、race detector、`go vet` |
+| Linux | Markdown Lint、ローカルリンク検査、ReactのUnit Testとビルド、GoのUnit Test、race detector、`go vet` |
 | Windows | ReactのUnit Testとビルド、GoのUnit Test、`go vet`、`go build ./...` |
 
 CIでは、GitHub-hosted runnerを使用します。workflowの`GITHUB_TOKEN`は`contents: read`だけを許可し、Secrets、デプロイ、コード署名を使用しません。生成した実行ファイルはartifactやGitHub Releasesへ保存しません。

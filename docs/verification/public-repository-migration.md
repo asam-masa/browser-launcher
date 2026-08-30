@@ -145,6 +145,23 @@ Public化後にDependabot alertsを有効にした結果、ルートと`wails-co
 
 ルートとSpikeでは、Go 1.26.6によるUnit Test、Go Vet、Go Build、`govulncheck v1.7.0`が成功しました。Spikeは、管理対象外のWailsバインディングとFrontend成果物を生成してから検証しました。`govulncheck`で到達可能な既知脆弱性は検出されませんでした。
 
+2026年8月30日に、SCRUM-52の作業ブランチでEchoをv4.13.3からv4.15.4へ更新しました。v4.15.3は`GHSA-vfp3-v2gw-7wfq`の修正版ですが、v4.15.4では同じ脆弱性への後続修正として、静的ファイルのパスを既定でアンエスケープしない動作へ変更されています。このため、Dependabot PR #2が提案したv4.15.3ではなくv4.15.4を採用しました。
+
+ルートとSpikeでは、Echoが必要とする次の推移依存も同じバージョンへ更新しました。
+
+| 対象 | 更新前 | 更新後 |
+| --- | --- | --- |
+| `github.com/labstack/echo/v4` | v4.13.3 | v4.15.4 |
+| `github.com/labstack/gommon` | v0.4.2 | v0.5.0 |
+| `github.com/mattn/go-colorable` | v0.1.13 | v0.1.15 |
+| `github.com/mattn/go-isatty` | v0.0.20 | v0.0.22 |
+| `golang.org/x/crypto` | v0.52.0 | v0.53.0 |
+| `golang.org/x/net` | v0.55.0 | v0.56.0 |
+| `golang.org/x/sys` | v0.45.0 | v0.46.0 |
+| `golang.org/x/text` | v0.37.0 | v0.38.0 |
+
+Linuxでは、両モジュールの`go mod tidy -diff`、Unit Test、Go Vet、Go Build、`govulncheck v1.7.0`が成功しました。`govulncheck`では既知脆弱性を検出しませんでした。Windows検証、Pull RequestのCI、マージ後のDependabot alert解消、Dependabot PR #2のクローズは未実施です。
+
 ## 残存リスクと未確認事項
 
 - Gitleaksの検出0件は、未知の形式や分割された秘密情報が存在しないことを保証しない
@@ -152,6 +169,7 @@ Public化後にDependabot alertsを有効にした結果、ルートと`wails-co
 - Linux CIでGoキャッシュの復元警告が発生したが、race detectorを含む全ステップとジョブは成功
 - Rulesetで必須チェック名を固定しているため、workflowのジョブ名を変更する場合はRulesetも更新する必要がある
 - SCRUM-51のLinux・Windows CIと、マージ後のDependabot alert解消状況は未確認
+- SCRUM-52のWindows検証、Linux・Windows CI、マージ後のDependabot alert解消状況は未確認
 - Spikeのnpm監査でHigh 1件を確認したが、Goの既知脆弱性を扱うSCRUM-51の対象外として変更していない
 
 ## 関連資料

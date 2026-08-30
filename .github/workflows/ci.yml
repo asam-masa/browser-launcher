@@ -29,7 +29,9 @@ jobs:
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache-dependency-path: go.sum
+          cache-dependency-path: |
+            go.sum
+            scripts/spike/wails-communication/go.sum
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -41,6 +43,10 @@ jobs:
             frontend/package-lock.json
 
       - name: Download Go modules
+        run: go mod download
+
+      - name: Download Spike Go modules
+        working-directory: scripts/spike/wails-communication
         run: go mod download
 
       - name: Install Markdown tooling
@@ -55,6 +61,12 @@ jobs:
           printf '<!doctype html><title>binding generation placeholder</title>\n' > frontend/dist/index.html
           go run github.com/wailsapp/wails/v2/cmd/wails@v2.12.0 generate module
 
+      - name: Prepare Spike assets
+        working-directory: scripts/spike/wails-communication
+        run: |
+          mkdir -p frontend/dist
+          printf '<!doctype html><title>spike verification placeholder</title>\n' > frontend/dist/index.html
+
       - name: Lint Markdown
         run: npm run lint:markdown
 
@@ -67,11 +79,27 @@ jobs:
       - name: Test Go
         run: go test ./...
 
+      - name: Test Spike Go
+        working-directory: scripts/spike/wails-communication
+        run: go test ./...
+
       - name: Test Go with race detector
+        run: go test -race ./...
+
+      - name: Test Spike Go with race detector
+        working-directory: scripts/spike/wails-communication
         run: go test -race ./...
 
       - name: Vet Go
         run: go vet ./...
+
+      - name: Vet Spike Go
+        working-directory: scripts/spike/wails-communication
+        run: go vet ./...
+
+      - name: Build Spike Go
+        working-directory: scripts/spike/wails-communication
+        run: go build ./...
 
   windows:
     name: Windows verification
@@ -88,7 +116,9 @@ jobs:
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
-          cache-dependency-path: go.sum
+          cache-dependency-path: |
+            go.sum
+            scripts/spike/wails-communication/go.sum
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -102,6 +132,10 @@ jobs:
       - name: Download Go modules
         run: go mod download
 
+      - name: Download Spike Go modules
+        working-directory: scripts/spike/wails-communication
+        run: go mod download
+
       - name: Install Markdown tooling
         run: npm.cmd ci
 
@@ -110,6 +144,14 @@ jobs:
 
       - name: Generate Wails bindings
         run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/develop/generate-wails-bindings.ps1
+
+      - name: Prepare Spike assets
+        shell: powershell
+        working-directory: scripts/spike/wails-communication
+        run: |
+          New-Item -ItemType Directory -Force frontend/dist | Out-Null
+          '<!doctype html><title>spike verification placeholder</title>' |
+            Set-Content -Encoding utf8 frontend/dist/index.html
 
       - name: Test frontend
         run: npm.cmd --prefix frontend test -- --run
@@ -120,8 +162,20 @@ jobs:
       - name: Test Go
         run: go test ./...
 
+      - name: Test Spike Go
+        working-directory: scripts/spike/wails-communication
+        run: go test ./...
+
       - name: Vet Go
         run: go vet ./...
 
+      - name: Vet Spike Go
+        working-directory: scripts/spike/wails-communication
+        run: go vet ./...
+
       - name: Build Go
+        run: go build ./...
+
+      - name: Build Spike Go
+        working-directory: scripts/spike/wails-communication
         run: go build ./...

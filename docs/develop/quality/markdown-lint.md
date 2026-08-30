@@ -28,6 +28,17 @@ npm run lint:markdown
 
 検査対象と除外対象は`.markdownlint-cli2.jsonc`で管理します。`node_modules/`や生成物の`dist/`は検査しません。
 
+## ローカルリンク検査
+
+リポジトリ内のMarkdownから参照するローカルファイルとディレクトリが存在することを検査します。
+
+```shell
+python3 -B .agents/skills/check-doc-consistency/scripts/check_markdown_links.py .
+```
+
+この検査は、外部URLとページ内アンカーの有効性を確認しません。Linux CIでは、Markdown
+Lintに続けて実行し、大文字・小文字を含むリンク先のパスを検証します。
+
 ## 規則
 
 原則として`markdownlint`の既定規則を使用します。プロジェクトの文書構成に合わせて、次の規則だけを変更します。

@@ -41,6 +41,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             frontend/package-lock.json
+            scripts/spike/wails-communication/frontend/package-lock.json
 
       - name: Download Go modules
         run: go mod download
@@ -55,17 +56,27 @@ jobs:
       - name: Install frontend dependencies
         run: npm --prefix frontend ci
 
+      - name: Install Spike frontend dependencies
+        run: npm --prefix scripts/spike/wails-communication/frontend ci
+
       - name: Generate Wails bindings
         run: |
           mkdir -p frontend/dist
           printf '<!doctype html><title>binding generation placeholder</title>\n' > frontend/dist/index.html
           go run github.com/wailsapp/wails/v2/cmd/wails@v2.12.0 generate module
 
-      - name: Prepare Spike assets
+      - name: Generate Spike Wails bindings
         working-directory: scripts/spike/wails-communication
         run: |
           mkdir -p frontend/dist
           printf '<!doctype html><title>spike verification placeholder</title>\n' > frontend/dist/index.html
+          go run github.com/wailsapp/wails/v2/cmd/wails@v2.12.0 generate module
+
+      - name: Audit Spike frontend
+        run: npm --prefix scripts/spike/wails-communication/frontend audit --audit-level=high
+
+      - name: Build Spike frontend
+        run: npm --prefix scripts/spike/wails-communication/frontend run build
 
       - name: Lint Markdown
         run: npm run lint:markdown
@@ -128,6 +139,7 @@ jobs:
           cache-dependency-path: |
             package-lock.json
             frontend/package-lock.json
+            scripts/spike/wails-communication/frontend/package-lock.json
 
       - name: Download Go modules
         run: go mod download
@@ -142,16 +154,23 @@ jobs:
       - name: Install frontend dependencies
         run: npm.cmd --prefix frontend ci
 
+      - name: Install Spike frontend dependencies
+        run: npm.cmd --prefix scripts/spike/wails-communication/frontend ci
+
       - name: Generate Wails bindings
         run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/develop/generate-wails-bindings.ps1
 
-      - name: Prepare Spike assets
+      - name: Generate Spike Wails bindings
         shell: powershell
         working-directory: scripts/spike/wails-communication
         run: |
           New-Item -ItemType Directory -Force frontend/dist | Out-Null
           '<!doctype html><title>spike verification placeholder</title>' |
             Set-Content -Encoding utf8 frontend/dist/index.html
+          go run github.com/wailsapp/wails/v2/cmd/wails@v2.12.0 generate module
+
+      - name: Build Spike frontend
+        run: npm.cmd --prefix scripts/spike/wails-communication/frontend run build
 
       - name: Test frontend
         run: npm.cmd --prefix frontend test -- --run

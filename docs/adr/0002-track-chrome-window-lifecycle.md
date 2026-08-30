@@ -70,10 +70,22 @@ WinEventは候補を確定する根拠にしません。起動前のスナップ
 - [x] Chrome起動済み時のイベントとスナップショットを記録できる
 - [x] プロファイル選択時の候補置き換わりを観測し、最終候補を目視確認できる
 - [x] 同時に別ウィンドウが開いた競合状態を再現できる
-- [ ] 複数候補を拒否する判定を製品実装の自動テストで確認できる
+- [x] 複数候補を拒否する判定を製品実装の自動テストで確認できる
 - [x] 無効になったハンドルが候補から消失することを確認できる
-- [ ] 取消と予期しない候補消失を製品実装の結果として区別できる
+- [x] 取消と予期しない候補消失を製品実装の結果として区別できる
 - [x] 明示的な取消時にフックを解除し、直後に再登録できる
 - [x] 60秒のタイムアウト時にフックを解除できる
-- [ ] 失敗時にフックを解除できる
+- [x] 失敗時にフックを解除できる
 - [x] 最大待機時間と利用者への表示を決定できる
+
+2026-08-30に、次の製品テストを根拠として未完了のValidationを確認しました。
+
+- 複数候補の拒否は、`TestSessionWaitDoesNotSelectOneOfConcurrentCandidates`と
+  `TestWorkflowClassifiesTrackingOutcomes`で確認しています。
+- 取消と予期しない候補消失の区別は、`TestSessionWaitClassifiesTerminalEvents`と
+  `TestWorkflowClassifiesTrackingOutcomes`で、追跡結果とエラーコードの違いを確認しています。
+- 失敗時の追跡リソース解放は、`TestWorkflowClassifiesLaunchFailureAndManagesTracking`と
+  `TestObservationCloseStopsResourcesOnce`で、起動失敗後の追跡終了とフックおよびタイマーの停止を確認しています。
+
+これらはテスト用の実装を使用した自動テストの結果です。Windows実機で`UnhookWinEvent`が
+呼び出されることの確認を置き換えるものではありません。

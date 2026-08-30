@@ -127,6 +127,14 @@ workflowで使用するActionはコミットSHAへ固定済みです。Public化
 
 `Protect main`では、Pull Request、会話の解決、最新の`main`への追従、`Linux verification`、`Windows verification`、linear history、squash mergeを必須にしています。ブランチ削除とForce pushは禁止し、bypass権限は設定していません。承認レビュー数は、個人開発で自己承認を必須にしないため0件です。
 
+2026年8月30日に、GitHubのPR一覧とCheck resultsでPublic化後のフォローアップPRを確認しました。
+
+| 対象 | 結果 |
+| --- | --- |
+| SCRUM-51 | PR #3を2026年8月26日に`main`へマージ済み。`Linux verification`と`Windows verification`は成功 |
+| SCRUM-52 | PR #5を2026年8月30日に`main`へマージ済み。`Linux verification`と`Windows verification`は成功 |
+| SCRUM-53 | PR #4を2026年8月29日に`main`へマージ済み。`Linux verification`と`Windows verification`は成功 |
+
 ## 既知脆弱性への対応
 
 Public化後にDependabot alertsを有効にした結果、ルートと`wails-communication` Spikeの`golang.org/x/crypto`と`golang.org/x/net`に38件のOpen alertを確認しました。Dependabot PR #1はSpikeの`golang.org/x/crypto`だけを更新するため、ルートとSpikeを同じ変更で整合させるSCRUM-51へ置き換えます。
@@ -160,7 +168,9 @@ Public化後にDependabot alertsを有効にした結果、ルートと`wails-co
 | `golang.org/x/sys` | v0.45.0 | v0.46.0 |
 | `golang.org/x/text` | v0.37.0 | v0.38.0 |
 
-Linuxでは、両モジュールの`go mod tidy -diff`、Unit Test、Go Vet、Go Build、`govulncheck v1.7.0`が成功しました。`govulncheck`では既知脆弱性を検出しませんでした。Windows検証、Pull RequestのCI、マージ後のDependabot alert解消、Dependabot PR #2のクローズは未実施です。
+Linuxでは、両モジュールの`go mod tidy -diff`、Unit Test、Go Vet、Go Build、`govulncheck v1.7.0`が成功しました。`govulncheck`では既知脆弱性を検出しませんでした。この時点では、Windows検証、Pull RequestのCI、マージ後のDependabot alert解消、Dependabot PR #2のクローズは未実施でした。
+
+2026年8月30日に、GitHubのCheck resultsでPR #3とPR #5の`Linux verification`および`Windows verification`が成功していることを確認しました。両PRは`main`へマージ済みです。GitHubのDependabot alertsで確認したOpen alertは0件であり、置き換え元のDependabot PR #1とPR #2は未マージでクローズ済みです。
 
 ## 残存リスクと未確認事項
 
@@ -168,9 +178,7 @@ Linuxでは、両モジュールの`go mod tidy -diff`、Unit Test、Go Vet、Go
 - 実在する外部コントリビューターのForkからPull Requestを作成する検証は未実施
 - Linux CIでGoキャッシュの復元警告が発生したが、race detectorを含む全ステップとジョブは成功
 - Rulesetで必須チェック名を固定しているため、workflowのジョブ名を変更する場合はRulesetも更新する必要がある
-- SCRUM-51のLinux・Windows CIと、マージ後のDependabot alert解消状況は未確認
-- SCRUM-52のWindows検証、Linux・Windows CI、マージ後のDependabot alert解消状況は未確認
-- Spikeのnpm監査でHigh 1件を確認したが、Goの既知脆弱性を扱うSCRUM-51の対象外として変更していない
+- 2026年8月30日のSpike frontendのnpm監査では、`nanoid`の`GHSA-2v37-7h3g-55p8`がHigh 1件として残っている
 
 ## 関連資料
 

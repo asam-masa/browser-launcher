@@ -28,6 +28,7 @@
 | 品質 | [日本語執筆ガイド](./quality/japanese-writing.md) | 通常の成果物作成で守る日本語の必須規則 |
 | 品質 | [日本語執筆ガイド参考](./quality/japanese-writing-reference.md) | 必要な場合だけ参照する説明、例、表記一覧、参考資料 |
 | 品質 | [Markdown Lint](./quality/markdown-lint.md) | Markdownの検査方法、設定、VS Code推奨拡張 |
+| 品質 | [依存関係の更新](./quality/dependency-updates.md) | Dependabotの対象、更新PRの確認、セキュリティ更新との関係 |
 | 開発フロー | [チケット運用](./workflow/ticket.md) | チケットタイプ、記載事項、完了条件、[Jiraテンプレート](../templates/jira-ticket.md) |
 | 開発フロー | [ストーリーポイント](./workflow/story-point.md) | 見積もりの目的と基準 |
 | 開発フロー | [ブランチ戦略](./workflow/branch.md) | ブランチの作成、命名、マージ方針 |

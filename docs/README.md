@@ -29,3 +29,4 @@
 - [ADR-0003: デスクトップアプリケーション基盤にWails v2を使用する](./adr/0003-use-wails-v2-for-desktop-foundation.md)
 - [ADR-0004: 物理座標でChrome起動条件を使用可能領域と比較する](./adr/0004-validate-launch-bounds-against-primary-work-area.md)
 - [ADR-0005: Windows向けバイナリを配布せずローカルでビルドする](./adr/0005-build-locally-without-distributing-windows-binaries.md)
+- [ADR-0006: 依存関係のversion updatesにDependabotを使用する](./adr/0006-use-dependabot-for-version-updates.md)

@@ -30,7 +30,7 @@ Windows 11でGoogle Chromeを指定した大きさと位置に起動するアプ
 
 - Windows 11
 - Go 1.26.6以上
-- Node.js 22以上
+- Node.js 22.12.0以上
 - npm
 - Microsoft Edge WebView2 Runtime
 
